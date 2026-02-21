@@ -1,0 +1,62 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import '../styles/global.css';
+import '../styles/post-page.css';
+import '../styles/modal.css';
+
+interface Props {
+  name: string;
+  tagline: string;
+  founded: number;
+  died: number;
+  funding: string;
+  sector: string;
+  causeOfDeath: string;
+  epitaph: string;
+  slug: string;
+}
+
+const { name, tagline, founded, died, funding, sector, causeOfDeath, epitaph, slug } = Astro.props;
+const title = `${name} (${founded}–${died}) — Startup Graveyard`;
+const description = `${tagline}. ${name} raised ${funding} and died in ${died}. Cause of death: ${causeOfDeath}.`;
+---
+
+<BaseLayout title={title} description={description}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": `${name} — Startup Graveyard`,
+      "description": description,
+      "author": { "@type": "Organization", "name": "Startup Graveyard" },
+    })} />
+  </Fragment>
+
+  <div class="post-page" style="overflow:auto;">
+    <div class="post-page-header">
+      <div class="ph-rip" style="font-size:0.3rem;letter-spacing:0.5em;color:rgba(200,195,175,0.22);margin-bottom:0.5rem;">REST IN PEACE</div>
+      <div class="post-page-name">{name}</div>
+      <div class="post-page-years">{founded}&ndash;{died}</div>
+      <div class="post-page-tagline">{tagline}</div>
+    </div>
+
+    <div class="post-page-meta">
+      <span class="pm-pill">{sector}</span>
+      <span class="pm-pill blood">{funding}</span>
+      <span class="pm-pill">{causeOfDeath}</span>
+    </div>
+
+    <div class="post-page-body">
+      <slot />
+    </div>
+
+    <div class="post-page-epitaph">
+      <div class="pf-label" style="font-size:0.28rem;letter-spacing:0.3em;color:rgba(122,40,40,0.35);margin-bottom:0.4rem;">EPITAPH</div>
+      <div class="pf-text" style="font-size:0.38rem;color:rgba(200,195,175,0.35);font-style:italic;line-height:2;">"{epitaph}"</div>
+    </div>
+
+    <div style="text-align:center;">
+      <a href="/" class="post-page-back">&larr; RETURN TO THE GRAVEYARD</a>
+    </div>
+  </div>
+</BaseLayout>

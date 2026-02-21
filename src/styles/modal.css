@@ -1,0 +1,267 @@
+/* ═══════ POST MODAL — GRAVESTONE ═══════ */
+
+#postOverlay {
+  position: fixed; inset: 0; z-index: 300;
+  background: rgba(5,6,4,0.88);
+  backdrop-filter: blur(14px);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; visibility: hidden;
+  transition: opacity 0.5s, visibility 0.5s;
+  perspective: 800px;
+}
+#postOverlay.active { opacity: 1; visibility: visible; }
+
+/* Outer wrapper for the tombstone shape */
+.stone-wrapper {
+  position: relative;
+  max-width: 480px;
+  width: 88%;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: translateY(30px) scale(0.94);
+  transition: transform 0.5s ease;
+  filter: drop-shadow(0 10px 40px rgba(0,0,0,0.7)) drop-shadow(0 2px 8px rgba(0,0,0,0.5));
+}
+#postOverlay.active .stone-wrapper { transform: translateY(0) scale(1); }
+
+/* The arch top — fixed, not scrolling */
+.stone-arch {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 480 / 160;
+  background: linear-gradient(178deg, #76735f 0%, #6b6854 20%, #605d4c 50%, #585546 80%, #555244 100%);
+  border-radius: 240px 240px 0 0;
+  flex-shrink: 0;
+  z-index: 2;
+  /* Stone texture overlay */
+  background-image:
+    linear-gradient(178deg, #76735f 0%, #6b6854 20%, #605d4c 50%, #585546 80%, #555244 100%),
+    repeating-linear-gradient(90deg, transparent 0, transparent 30px, rgba(0,0,0,0.015) 30px, rgba(0,0,0,0.015) 31px),
+    repeating-linear-gradient(0deg, transparent 0, transparent 40px, rgba(0,0,0,0.01) 40px, rgba(0,0,0,0.01) 41px);
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,0.06),
+    inset 0 -1px 0 rgba(0,0,0,0.1),
+    inset 4px 0 8px rgba(0,0,0,0.08),
+    inset -4px 0 8px rgba(0,0,0,0.08);
+}
+
+.stone-arch-content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 2rem 0.5rem;
+  text-align: center;
+}
+
+/* Close button on the stone */
+.close-btn {
+  position: absolute;
+  top: 1.2rem;
+  right: 1.5rem;
+  width: 24px; height: 24px;
+  border: 1px solid rgba(200,195,175,0.15);
+  border-radius: 50%;
+  background: rgba(80,78,66,0.6);
+  color: rgba(200,195,175,0.4);
+  font-family: var(--px); font-size: 0.4rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.3s; z-index: 20;
+}
+.close-btn:hover { border-color: rgba(200,195,175,0.35); color: rgba(220,215,195,0.8); background: rgba(90,87,72,0.7); }
+
+.ph-rip { font-size: 0.3rem; letter-spacing: 0.5em; color: rgba(200,195,175,0.22); margin-bottom: 0.5rem; }
+.ph-name { font-size: clamp(0.8rem, 2.8vw, 1.3rem); color: rgba(220,215,195,0.85); margin-bottom: 0.3rem; text-shadow: 0 1px 3px rgba(0,0,0,0.4); }
+.ph-years { font-size: 0.35rem; color: rgba(200,195,175,0.3); letter-spacing: 0.12em; margin-bottom: 0.3rem; }
+.ph-tagline { font-size: 0.4rem; color: rgba(200,195,175,0.4); line-height: 2; font-style: italic; }
+
+/* The stone body — scrollable */
+.stone-body {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: linear-gradient(178deg, #555244 0%, #535042 5%, #504d40 30%, #4c493c 60%, #484538 100%);
+  box-shadow:
+    inset 4px 0 10px rgba(0,0,0,0.1),
+    inset -4px 0 10px rgba(0,0,0,0.1),
+    inset 0 3px 6px rgba(0,0,0,0.08);
+  background-image:
+    linear-gradient(178deg, #555244 0%, #535042 5%, #504d40 30%, #4c493c 60%, #484538 100%),
+    repeating-linear-gradient(90deg, transparent 0, transparent 30px, rgba(0,0,0,0.012) 30px, rgba(0,0,0,0.012) 31px),
+    repeating-linear-gradient(0deg, transparent 0, transparent 40px, rgba(0,0,0,0.008) 40px, rgba(0,0,0,0.008) 41px);
+  z-index: 1;
+}
+
+.stone-body::-webkit-scrollbar { width: 5px; }
+.stone-body::-webkit-scrollbar-track { background: rgba(70,68,56,0.3); }
+.stone-body::-webkit-scrollbar-thumb { background: rgba(100,97,82,0.5); border-radius: 3px; }
+.stone-body::-webkit-scrollbar-thumb:hover { background: rgba(120,116,98,0.6); }
+
+.stone-body-inner {
+  padding: 1.2rem 2rem 2rem;
+}
+
+/* Chisel line separator */
+.chisel-line {
+  width: 60%;
+  height: 1px;
+  background: rgba(0,0,0,0.15);
+  margin: 0 auto 1rem;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.03);
+}
+
+.post-meta {
+  display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1.2rem;
+}
+
+.pm-pill {
+  padding: 0.2rem 0.45rem;
+  border: 1px solid rgba(200,195,175,0.08);
+  border-radius: 2px;
+  font-size: 0.28rem;
+  color: rgba(200,195,175,0.3);
+  letter-spacing: 0.06em;
+  background: rgba(0,0,0,0.08);
+}
+.pm-pill.blood { border-color: rgba(122,40,40,0.2); color: rgba(180,120,120,0.4); }
+
+.post-body {
+  font-family: var(--px);
+  font-size: 0.38rem;
+  line-height: 2.4;
+  color: rgba(200,195,175,0.55);
+}
+.post-body p { margin-bottom: 1rem; }
+.post-body .sec-title {
+  font-size: 0.45rem;
+  color: rgba(220,215,195,0.7);
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.1em;
+}
+.post-body .pull-quote {
+  border-left: 2px solid rgba(122,40,40,0.3);
+  padding-left: 0.8rem;
+  margin: 1rem 0;
+  color: rgba(200,195,175,0.35);
+  font-style: italic;
+}
+
+.post-footer {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  text-align: center;
+}
+
+.chisel-line-sm {
+  width: 40%;
+  height: 1px;
+  background: rgba(0,0,0,0.12);
+  margin: 0 auto 0.8rem;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.02);
+}
+
+.pf-label { font-size: 0.28rem; letter-spacing: 0.3em; color: rgba(122,40,40,0.35); margin-bottom: 0.4rem; }
+.pf-text { font-size: 0.38rem; color: rgba(200,195,175,0.35); font-style: italic; line-height: 2; }
+
+/* The stone base — fixed bottom */
+.stone-base {
+  width: calc(100% + 16px);
+  height: 28px;
+  background: linear-gradient(178deg, #484538, #424034 50%, #3e3b32);
+  border-radius: 0 0 4px 4px;
+  flex-shrink: 0;
+  z-index: 2;
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,0.02),
+    0 4px 12px rgba(0,0,0,0.4);
+  margin: 0 -8px;
+}
+
+/* Dirt mound beneath stone */
+.stone-dirt {
+  width: calc(100% + 40px);
+  height: 20px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(40,34,20,0.7) 0%, rgba(30,26,14,0.4) 50%, transparent 80%);
+  flex-shrink: 0;
+  margin: -2px -20px 0;
+}
+
+/* Scroll indicator engraved */
+.scroll-engrave {
+  text-align: center;
+  padding: 0.6rem 0;
+  font-size: 0.25rem;
+  color: rgba(200,195,175,0.15);
+  letter-spacing: 0.15em;
+}
+
+.scroll-engrave .arrow-down {
+  display: inline-block;
+  animation: engraveArrow 1.5s ease-in-out infinite;
+}
+
+/* Cracks overlaid on the stone */
+.stone-crack {
+  position: absolute;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.crack-1 {
+  top: 55%;
+  left: 8%;
+  width: 25%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0,0,0,0.12) 20%, rgba(0,0,0,0.08) 60%, transparent);
+  transform: rotate(12deg);
+}
+
+.crack-2 {
+  top: 70%;
+  right: 12%;
+  width: 18%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0,0,0,0.1) 30%, rgba(0,0,0,0.06) 70%, transparent);
+  transform: rotate(-8deg);
+}
+
+/* Moss patches */
+.stone-moss {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.moss-1 {
+  bottom: 12%;
+  left: 3%;
+  width: 30px;
+  height: 15px;
+  background: radial-gradient(ellipse, rgba(55,75,40,0.15), transparent 70%);
+}
+
+.moss-2 {
+  top: 45%;
+  right: 2%;
+  width: 22px;
+  height: 12px;
+  background: radial-gradient(ellipse, rgba(50,70,38,0.1), transparent 70%);
+}
+
+/* ═══════ RESPONSIVE — MODAL ═══════ */
+
+@media (max-width: 600px) {
+  .stone-wrapper { width: 94%; }
+  .stone-arch-content { padding: 1rem 1.2rem 0.3rem; }
+  .stone-body-inner { padding: 1rem 1.2rem 1.5rem; }
+  .ph-name { font-size: 0.8rem; }
+}

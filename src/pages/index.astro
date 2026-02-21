@@ -1,0 +1,217 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TitleScreen from '../components/TitleScreen.astro';
+import GraveyardWorld from '../components/GraveyardWorld.astro';
+import HUD from '../components/HUD.astro';
+import PostModal from '../components/PostModal.astro';
+import SearchPanel from '../components/SearchPanel.astro';
+
+import '../styles/global.css';
+import '../styles/title.css';
+import '../styles/world.css';
+import '../styles/hud.css';
+import '../styles/modal.css';
+
+const entries = await getCollection('graveyard');
+const sorted = entries.sort((a, b) => b.data.fundingBillions - a.data.fundingBillions);
+
+const count = sorted.length;
+const totalB = sorted.reduce((s, e) => s + e.data.fundingBillions, 0);
+const totalCapital = '$' + totalB.toFixed(1) + 'B';
+
+// Unique sectors and causes for filter dropdowns
+const sectors = [...new Set(sorted.map(e => e.data.sector))].sort();
+const causes = [...new Set(sorted.map(e => e.data.causeOfDeath))].sort();
+
+// Prepare entry data for the engine (client-side)
+const entryData = sorted.map(e => ({
+  name: e.data.name,
+  slug: e.data.slug,
+  tagline: e.data.tagline,
+  founded: e.data.founded,
+  died: e.data.died,
+  funding: e.data.funding,
+  fundingBillions: e.data.fundingBillions,
+  sector: e.data.sector,
+  causeOfDeath: e.data.causeOfDeath,
+  tombstoneShape: e.data.tombstoneShape,
+  zone: e.data.zone,
+  epitaph: e.data.epitaph,
+  causeShort: e.data.causeShort,
+}));
+---
+
+<BaseLayout title="Startup Graveyard — Where Unicorn Dreams Come to Rest">
+  <TitleScreen count={count} totalCapital={totalCapital} />
+  <GraveyardWorld />
+  <HUD count={count} totalCapital={totalCapital} />
+  <SearchPanel sectors={sectors} causes={causes} />
+  <PostModal />
+
+  <!-- Pre-rendered post templates (hidden, cloned into modal by JS) -->
+  {sorted.map(async (entry) => {
+    const { Content } = await render(entry);
+    return (
+      <template data-slug={entry.data.slug}>
+        <div class="scroll-engrave"><span class="arrow-down">&#9660;</span> SCROLL TO READ <span class="arrow-down">&#9660;</span></div>
+        <div class="chisel-line"></div>
+        <div class="post-meta">
+          <span class="pm-pill">{entry.data.sector}</span>
+          <span class="pm-pill blood">{entry.data.funding}</span>
+          <span class="pm-pill">{entry.data.causeOfDeath}</span>
+        </div>
+        <div class="post-body"><Content /></div>
+        <div class="post-footer">
+          <div class="chisel-line-sm"></div>
+          <div class="pf-label">EPITAPH</div>
+          <div class="pf-text">"{entry.data.epitaph}"</div>
+        </div>
+      </template>
+    );
+  })}
+
+  <!-- Engine data + boot script -->
+  <script define:vars={{ entryData }}>
+    window.__GRAVEYARD_ENTRIES__ = entryData;
+  </script>
+
+  <script>
+    import { Engine } from '../engine/Engine';
+    import type { StartupEntry } from '../engine/types';
+
+    const entries: StartupEntry[] = (window as any).__GRAVEYARD_ENTRIES__;
+
+    // DOM elements
+    const viewport = document.getElementById('viewport')!;
+    const world = document.getElementById('world')!;
+    const minimap = document.getElementById('minimap')!;
+    const mmViewport = document.getElementById('mmViewport')!;
+
+    // Modal elements
+    const postOverlay = document.getElementById('postOverlay')!;
+    const stoneHeader = document.getElementById('stoneHeader')!;
+    const stoneBodyInner = document.getElementById('stoneBodyInner')!;
+    const stoneBody = document.getElementById('stoneBody')!;
+    const closeBtn = document.getElementById('closeBtn')!;
+
+    // Title screen
+    const titleScreen = document.getElementById('titleScreen')!;
+    const startBtn = document.getElementById('startBtn')!;
+    const hud = document.getElementById('hud')!;
+    const navHint = document.getElementById('navHint')!;
+
+    // Search elements
+    const searchToggle = document.getElementById('searchToggle')!;
+    const searchBody = document.getElementById('searchBody')!;
+    const searchInput = document.getElementById('searchInput') as HTMLInputElement;
+    const sectorFilter = document.getElementById('sectorFilter') as HTMLSelectElement;
+    const causeFilter = document.getElementById('causeFilter') as HTMLSelectElement;
+    const searchClear = document.getElementById('searchClear')!;
+    const searchPanel = document.getElementById('searchPanel')!;
+
+    function openPost(slug: string) {
+      const entry = entries.find(e => e.slug === slug);
+      if (!entry) return;
+
+      stoneHeader.innerHTML = `
+        <div class="ph-rip">REST IN PEACE</div>
+        <div class="ph-name">${entry.name}</div>
+        <div class="ph-years">${entry.founded}\u2013${entry.died}</div>
+        <div class="ph-tagline">${entry.tagline}</div>
+      `;
+
+      const template = document.querySelector(`template[data-slug="${slug}"]`) as HTMLTemplateElement;
+      if (template) {
+        stoneBodyInner.innerHTML = '';
+        stoneBodyInner.appendChild(template.content.cloneNode(true));
+      }
+
+      stoneBody.scrollTop = 0;
+      postOverlay.classList.add('active');
+      history.pushState({ slug }, '', `/graveyard/${slug}`);
+    }
+
+    function closePost() {
+      postOverlay.classList.remove('active');
+      if (history.state?.slug) {
+        history.pushState(null, '', '/');
+      }
+    }
+
+    // Close modal handlers
+    closeBtn.addEventListener('click', closePost);
+    postOverlay.addEventListener('click', (e) => {
+      if (e.target === postOverlay) closePost();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closePost();
+    });
+
+    window.addEventListener('popstate', (e) => {
+      if (e.state?.slug) {
+        openPost(e.state.slug);
+      } else {
+        postOverlay.classList.remove('active');
+      }
+    });
+
+    // Create engine
+    const engine = new Engine(
+      { viewport, world, minimap, mmViewport },
+      entries,
+      openPost,
+    );
+
+    engine.init();
+
+    // Search/filter wiring
+    searchToggle.addEventListener('click', () => {
+      searchBody.classList.toggle('open');
+    });
+
+    function applyFilter() {
+      engine.filterTombstones(
+        searchInput.value,
+        sectorFilter.value,
+        causeFilter.value,
+      );
+    }
+
+    searchInput.addEventListener('input', applyFilter);
+    sectorFilter.addEventListener('change', applyFilter);
+    causeFilter.addEventListener('change', applyFilter);
+    searchClear.addEventListener('click', () => {
+      searchInput.value = '';
+      sectorFilter.value = '';
+      causeFilter.value = '';
+      engine.clearFilter();
+    });
+
+    // Hide search panel initially (shown after entering graveyard)
+    searchPanel.style.display = 'none';
+
+    // Start button
+    startBtn.addEventListener('click', () => {
+      titleScreen.classList.add('hidden');
+      viewport.classList.add('active');
+      hud.classList.add('visible');
+      navHint.classList.add('visible');
+      searchPanel.style.display = '';
+      engine.start();
+      setTimeout(() => { titleScreen.style.display = 'none'; }, 1200);
+      setTimeout(() => { navHint.classList.remove('visible'); }, 5000);
+    });
+
+    // Direct URL to a post
+    const pathMatch = window.location.pathname.match(/^\/graveyard\/(.+)$/);
+    if (pathMatch) {
+      titleScreen.style.display = 'none';
+      viewport.classList.add('active');
+      hud.classList.add('visible');
+      searchPanel.style.display = '';
+      engine.start();
+      openPost(pathMatch[1]);
+    }
+  </script>
+</BaseLayout>

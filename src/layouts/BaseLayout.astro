@@ -1,0 +1,42 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+  ogImage?: string;
+}
+
+const { title, description = 'Where unicorn dreams come to rest and lessons rise from the dead', ogImage } = Astro.props;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? 'https://startupgraveyard.io');
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+  <link rel="canonical" href={canonicalURL.href} />
+
+  <!-- OG -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  {ogImage && <meta property="og:image" content={ogImage} />}
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <!-- Font -->
+  <style is:inline>
+    @font-face {
+      font-family: 'Press Start 2P';
+      src: url('/fonts/PressStart2P-Regular.ttf') format('truetype');
+      font-display: swap;
+    }
+  </style>
+
+  <slot name="head" />
+</head>
+<body>
+  <slot />
+</body>
+</html>

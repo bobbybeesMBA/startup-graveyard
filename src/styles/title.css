@@ -1,0 +1,88 @@
+/* ═══════ TITLE SCREEN ═══════ */
+
+#titleScreen {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  background: #0a0c08;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  transition: opacity 1.2s ease;
+}
+#titleScreen.hidden { opacity: 0; pointer-events: none; }
+
+.title-gate {
+  font-size: clamp(1rem, 3vw, 1.8rem);
+  color: var(--text-dim);
+  letter-spacing: 0.15em;
+}
+
+.title-main {
+  font-size: clamp(1.6rem, 5vw, 3.2rem);
+  color: var(--text-bright);
+  text-shadow: 0 0 30px rgba(180,200,120,0.12), 0 3px 0 #1a1e12;
+  letter-spacing: 0.08em;
+  text-align: center;
+  padding: 0 1rem;
+}
+
+.title-sub {
+  font-size: clamp(0.4rem, 1.2vw, 0.6rem);
+  color: var(--text-dim);
+  letter-spacing: 0.2em;
+  max-width: 500px;
+  text-align: center;
+  line-height: 2;
+  padding: 0 2rem;
+}
+
+.title-stats {
+  display: flex;
+  gap: 2.5rem;
+  margin-top: 0.5rem;
+}
+
+.title-stat {
+  text-align: center;
+}
+
+.title-stat .num {
+  font-size: clamp(0.8rem, 2vw, 1.2rem);
+  color: rgba(140,60,60,0.7);
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+.title-stat .label {
+  font-size: 0.35rem;
+  color: var(--text-dim);
+  letter-spacing: 0.15em;
+}
+
+.start-btn {
+  margin-top: 1.5rem;
+  font-family: var(--px);
+  font-size: clamp(0.55rem, 1.3vw, 0.7rem);
+  color: var(--text-mid);
+  background: none;
+  border: 1px solid rgba(180,175,155,0.2);
+  padding: 0.7rem 1.8rem;
+  cursor: pointer;
+  letter-spacing: 0.15em;
+  transition: all 0.3s;
+  animation: blink 2s step-end infinite;
+}
+
+.start-btn:hover {
+  border-color: rgba(180,200,120,0.4);
+  color: var(--text-bright);
+  background: rgba(180,200,120,0.05);
+  animation: none;
+}
+
+@keyframes blink {
+  50% { border-color: transparent; }
+}

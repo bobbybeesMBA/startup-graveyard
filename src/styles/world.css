@@ -1,0 +1,302 @@
+/* ═══════ GAME VIEWPORT ═══════ */
+
+#viewport {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  display: none;
+  cursor: grab;
+  background: #0a0c08;
+}
+#viewport.active { display: block; }
+#viewport.dragging { cursor: grabbing; }
+
+/* The world container — we translate this */
+#world {
+  position: absolute;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+/* Isometric ground plane */
+#isoPlane {
+  position: absolute;
+  transform: rotateX(55deg) rotateZ(-45deg);
+  transform-style: preserve-3d;
+  transform-origin: center center;
+}
+
+/* Ground tiles */
+.ground-tile {
+  position: absolute;
+  background: var(--ground);
+  border: 1px solid rgba(60,70,40,0.08);
+}
+
+/* Grass patches */
+.grass-patch {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Dirt paths */
+.dirt-path {
+  position: absolute;
+  background: var(--path);
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* ═══════ TOMBSTONES (2.5D) ═══════ */
+
+.grave {
+  position: absolute;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  /* Each grave positioned absolutely in the world */
+}
+
+.grave:hover { transform: translateY(-4px); }
+.grave:hover .grave-glow { opacity: 1; }
+.grave:hover .grave-label { opacity: 1; }
+.grave:hover .grave-stone { filter: brightness(1.2); }
+
+.grave-shadow {
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  height: 16px;
+  background: radial-gradient(ellipse, rgba(0,0,0,0.4) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.grave-glow {
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 130%;
+  height: 40px;
+  background: radial-gradient(ellipse, var(--glow) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.4s;
+  pointer-events: none;
+}
+
+.grave-stone {
+  position: relative;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: filter 0.3s;
+}
+
+/* Shape variants */
+.grave-arch .grave-stone {
+  width: 80px; height: 100px;
+  background: linear-gradient(175deg, #706d5d, #585648 60%, #4e4c40);
+  border-radius: 40px 40px 3px 3px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+  padding: 16px 8px 8px;
+}
+
+.grave-tall .grave-stone {
+  width: 65px; height: 110px;
+  background: linear-gradient(175deg, #686658, #504e44 60%, #444238);
+  border-radius: 4px 4px 2px 2px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04);
+  padding: 14px 6px 8px;
+}
+
+.grave-cross .grave-stone {
+  width: 75px; height: 105px;
+  background: linear-gradient(175deg, #6a6858, #555348 60%, #4a483e);
+  border-radius: 4px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04);
+  padding: 22px 8px 8px;
+}
+
+.grave-cross .grave-stone::before {
+  content: '+';
+  position: absolute; top: -18px; left: 50%; transform: translateX(-50%);
+  font-size: 1.4rem; color: #5a5848; text-shadow: 0 2px 3px rgba(0,0,0,0.4);
+}
+
+.grave-wide .grave-stone {
+  width: 100px; height: 80px;
+  background: linear-gradient(175deg, #73705f, #5c5a4e 60%, #504e42);
+  border-radius: 6px 6px 2px 2px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+  padding: 12px 8px 8px;
+}
+
+.grave-obelisk .grave-stone {
+  width: 44px; height: 120px;
+  background: linear-gradient(175deg, #787566, #5e5c52 60%, #504e46);
+  clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.5);
+  padding: 28px 4px 8px;
+}
+
+.grave-slab .grave-stone {
+  width: 110px; height: 45px;
+  background: linear-gradient(175deg, #5e5c50, #4a483e 60%, #3e3c34);
+  border-radius: 3px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.03);
+  padding: 8px;
+  justify-content: center;
+}
+
+.grave-angel .grave-stone {
+  width: 85px; height: 115px;
+  background: linear-gradient(175deg, #7a7868, #605e52 60%, #525048);
+  border-radius: 42px 42px 4px 4px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06);
+  padding: 18px 8px 8px;
+}
+
+.grave-angel .grave-stone::before {
+  content: '\25C7';
+  position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+  font-size: 0.8rem; color: rgba(180,175,155,0.3);
+}
+
+.g-rip {
+  font-size: 0.25rem;
+  letter-spacing: 0.25em;
+  color: rgba(200,195,180,0.25);
+  margin-bottom: 3px;
+}
+
+.g-name {
+  font-size: 0.45rem;
+  color: rgba(220,215,195,0.8);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  line-height: 1.4;
+  margin-bottom: 2px;
+  word-break: break-word;
+}
+
+.g-years {
+  font-size: 0.22rem;
+  color: rgba(200,195,180,0.3);
+  letter-spacing: 0.05em;
+}
+
+.g-funding {
+  font-size: 0.2rem;
+  color: rgba(140,60,60,0.5);
+  margin-top: 3px;
+  letter-spacing: 0.05em;
+}
+
+.grave-dirt {
+  width: 90%;
+  height: 10px;
+  background: radial-gradient(ellipse, rgba(35,30,18,0.8) 0%, transparent 70%);
+  margin-top: -2px;
+}
+
+.grave-label {
+  position: absolute;
+  top: -22px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.35rem;
+  color: rgba(180,200,120,0.7);
+  background: rgba(10,12,8,0.85);
+  border: 1px solid rgba(180,200,120,0.2);
+  padding: 2px 7px;
+  border-radius: 2px;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+  z-index: 20;
+}
+
+/* Decorative elements */
+.deco {
+  position: absolute;
+  pointer-events: none;
+}
+
+.deco-tree {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.tree-top {
+  width: 40px; height: 50px;
+  background: radial-gradient(ellipse at 50% 60%, #1e2a14, #151e0c 70%, transparent);
+  border-radius: 50%;
+}
+
+.tree-trunk {
+  width: 6px; height: 30px;
+  background: #201a0e;
+  margin-top: -8px;
+}
+
+.tree-shadow {
+  width: 50px; height: 12px;
+  background: radial-gradient(ellipse, rgba(0,0,0,0.25) 0%, transparent 70%);
+  margin-top: -2px;
+}
+
+.deco-bush {
+  width: 28px; height: 18px;
+  background: radial-gradient(ellipse, #232e18, #1a2210 70%, transparent);
+  border-radius: 50%;
+}
+
+.deco-rock {
+  width: 18px; height: 12px;
+  background: #3a3830;
+  border-radius: 40% 50% 45% 55%;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+}
+
+.deco-lantern {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.lantern-glow {
+  width: 10px; height: 12px;
+  background: rgba(200,170,60,0.15);
+  border: 1px solid rgba(180,150,50,0.15);
+  border-radius: 2px 2px 3px 3px;
+  box-shadow: 0 0 20px rgba(200,170,60,0.06);
+  animation: flicker 3s ease-in-out infinite alternate;
+}
+
+.lantern-pole {
+  width: 3px; height: 28px;
+  background: #1e1c14;
+}
+
+.deco-fence-h, .deco-fence-v {
+  background: #252218;
+  position: absolute;
+  pointer-events: none;
+}
+
+.deco-fence-h { height: 3px; }
+.deco-fence-v { width: 3px; }
+
+/* Fog wisps */
+.fog-wisp {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(140,160,140,0.04), transparent 70%);
+  pointer-events: none;
+  animation: fogFloat 20s ease-in-out infinite alternate;
+}

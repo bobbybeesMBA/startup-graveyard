@@ -1,0 +1,18 @@
+---
+interface Props {
+  count: number;
+  totalCapital: string;
+}
+const { count, totalCapital } = Astro.props;
+---
+
+<div id="titleScreen">
+  <div class="title-gate">&#9904; &#9904; &#9904;</div>
+  <div class="title-main">STARTUP GRAVEYARD</div>
+  <div class="title-sub">WHERE UNICORN DREAMS COME TO REST AND LESSONS RISE FROM THE DEAD</div>
+  <div class="title-stats">
+    <div class="title-stat"><span class="num" id="tCount">{count}</span><span class="label">BURIED</span></div>
+    <div class="title-stat"><span class="num" id="tCapital">{totalCapital}</span><span class="label">DESTROYED</span></div>
+  </div>
+  <button class="start-btn" id="startBtn">ENTER THE GRAVEYARD</button>
+</div>

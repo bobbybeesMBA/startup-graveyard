@@ -1,0 +1,41 @@
+/* ═══════ GLOBAL — Variables, Reset, Base, Shared Keyframes ═══════ */
+
+:root {
+  --px: 'Press Start 2P', monospace;
+  --ground: #1a1e12;
+  --grass: #2a3318;
+  --grass-light: #3a4528;
+  --path: #2e2a20;
+  --stone-1: #6b6858;
+  --stone-2: #5a584a;
+  --stone-3: #7a7868;
+  --fog: rgba(140,160,140,0.03);
+  --glow: rgba(180,200,120,0.15);
+  --text-dim: rgba(180,175,155,0.4);
+  --text-mid: rgba(200,195,170,0.6);
+  --text-bright: rgba(220,215,190,0.85);
+  --blood: #7a2828;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; overflow: hidden; background: #0a0c08; }
+
+body {
+  font-family: var(--px);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+@keyframes flicker {
+  0%,100% { opacity: 0.6; } 40% { opacity: 1; } 70% { opacity: 0.4; }
+}
+
+@keyframes fogFloat {
+  from { transform: translate(0, 0); }
+  to { transform: translate(40px, -20px); }
+}
+
+@keyframes engraveArrow {
+  0%,100% { transform: translateY(0); opacity: 0.3; }
+  50% { transform: translateY(3px); opacity: 0.6; }
+}

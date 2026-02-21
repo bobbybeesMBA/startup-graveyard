@@ -1,0 +1,23 @@
+---
+interface Props {
+  count: number;
+  totalCapital: string;
+}
+const { count, totalCapital } = Astro.props;
+---
+
+<div id="hud">
+  <div class="hud-title">STARTUP GRAVEYARD</div>
+  <div class="hud-right">
+    <div class="hud-stat">BURIED: <span class="val" id="hudCount">{count}</span></div>
+    <div class="hud-stat">CAPITAL LOST: <span class="val" id="hudCap">{totalCapital}</span></div>
+    <div class="minimap" id="minimap">
+      <div class="mm-viewport" id="mmViewport"></div>
+    </div>
+  </div>
+</div>
+
+<div class="nav-hint" id="navHint">
+  <span class="key">WASD</span> / <span class="key">ARROWS</span> / DRAG TO EXPLORE<br />
+  CLICK A TOMBSTONE TO READ ITS STORY
+</div>

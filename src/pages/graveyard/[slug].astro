@@ -1,0 +1,30 @@
+---
+import { getCollection, render } from 'astro:content';
+import PostLayout from '../../layouts/PostLayout.astro';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('graveyard');
+  return entries.map(entry => ({
+    params: { slug: entry.data.slug },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const { name, tagline, founded, died, funding, sector, causeOfDeath, epitaph, slug } = entry.data;
+---
+
+<PostLayout
+  name={name}
+  tagline={tagline}
+  founded={founded}
+  died={died}
+  funding={funding}
+  sector={sector}
+  causeOfDeath={causeOfDeath}
+  epitaph={epitaph}
+  slug={slug}
+>
+  <Content />
+</PostLayout>
