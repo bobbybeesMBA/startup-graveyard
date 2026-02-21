@@ -16,7 +16,6 @@ import '../styles/modal.css';
 const entries = await getCollection('graveyard');
 const sorted = entries.sort((a, b) => b.data.fundingBillions - a.data.fundingBillions);
 
-const count = sorted.length;
 const totalB = sorted.reduce((s, e) => s + e.data.fundingBillions, 0);
 const totalCapital = '$' + totalB.toFixed(1) + 'B';
 
@@ -43,9 +42,9 @@ const entryData = sorted.map(e => ({
 ---
 
 <BaseLayout title="Startup Graveyard — Where Unicorn Dreams Come to Rest">
-  <TitleScreen count={count} totalCapital={totalCapital} />
+  <TitleScreen totalCapital={totalCapital} />
   <GraveyardWorld />
-  <HUD count={count} totalCapital={totalCapital} />
+  <HUD totalCapital={totalCapital} />
   <SearchPanel sectors={sectors} causes={causes} />
   <PostModal />
 
