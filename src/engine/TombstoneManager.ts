@@ -7,11 +7,13 @@ export class TombstoneManager {
   private positions: Position[] = [];
   private graveElements: HTMLElement[] = [];
   private onTombstoneClick: (slug: string) => void;
+  private visited: Set<string>;
 
   constructor(world: HTMLElement, entries: StartupEntry[], onClick: (slug: string) => void) {
     this.world = world;
     this.entries = entries;
     this.onTombstoneClick = onClick;
+    this.visited = new Set(JSON.parse(localStorage.getItem('sg_visited') || '[]'));
   }
 
   place() {
@@ -40,7 +42,13 @@ export class TombstoneManager {
         </div>
         <div class="grave-dirt"></div>
       `;
-      el.addEventListener('click', () => this.onTombstoneClick(entry.slug));
+      if (this.visited.has(entry.slug)) {
+        el.classList.add('visited');
+      }
+      el.addEventListener('click', () => {
+        this.markVisited(entry.slug, el);
+        this.onTombstoneClick(entry.slug);
+      });
       this.world.appendChild(el);
       this.graveElements.push(el);
     });
@@ -67,6 +75,13 @@ export class TombstoneManager {
       el.style.opacity = '1';
       el.style.pointerEvents = 'auto';
     });
+  }
+
+  private markVisited(slug: string, el: HTMLElement) {
+    if (this.visited.has(slug)) return;
+    this.visited.add(slug);
+    el.classList.add('visited');
+    localStorage.setItem('sg_visited', JSON.stringify([...this.visited]));
   }
 
   private generatePositions(count: number): Position[] {
