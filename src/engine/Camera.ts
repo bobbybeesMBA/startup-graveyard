@@ -1,10 +1,12 @@
-import { WORLD_W, WORLD_H, CAMERA_LERP } from './constants';
+import { WORLD_W, WORLD_H, CAMERA_LERP, MIN_ZOOM, MAX_ZOOM, ZOOM_LERP } from './constants';
 
 export class Camera {
   x = 0;
   y = 0;
   targetX = 0;
   targetY = 0;
+  zoom = 1;
+  targetZoom = 1;
 
   private worldW: number;
   private worldH: number;
@@ -31,9 +33,19 @@ export class Camera {
     this.targetY = y;
   }
 
+  setZoom(z: number) {
+    this.targetZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, z));
+  }
+
+  adjustZoom(delta: number) {
+    this.setZoom(this.targetZoom + delta);
+  }
+
   clamp() {
-    const maxX = Math.max(0, this.worldW - window.innerWidth);
-    const maxY = Math.max(0, this.worldH - window.innerHeight);
+    const vw = window.innerWidth / this.zoom;
+    const vh = window.innerHeight / this.zoom;
+    const maxX = Math.max(0, this.worldW - vw);
+    const maxY = Math.max(0, this.worldH - vh);
     this.targetX = Math.max(0, Math.min(this.targetX, maxX));
     this.targetY = Math.max(0, Math.min(this.targetY, maxY));
   }
@@ -42,5 +54,6 @@ export class Camera {
     this.clamp();
     this.x += (this.targetX - this.x) * CAMERA_LERP;
     this.y += (this.targetY - this.y) * CAMERA_LERP;
+    this.zoom += (this.targetZoom - this.zoom) * ZOOM_LERP;
   }
 }

@@ -1,5 +1,5 @@
 import { Camera } from './Camera';
-import { KEYBOARD_SPEED, WHEEL_MULTIPLIER, WORLD_W, WORLD_H, MINIMAP_SIZE } from './constants';
+import { KEYBOARD_SPEED, WHEEL_MULTIPLIER, WORLD_W, WORLD_H, PINCH_ZOOM_SPEED, WHEEL_ZOOM_SPEED } from './constants';
 
 export class Input {
   private keys: Record<string, boolean> = {};
@@ -12,6 +12,8 @@ export class Input {
   private touchStartY = 0;
   private touchCamX = 0;
   private touchCamY = 0;
+  private lastPinchDist = 0;
+  private isPinching = false;
 
   private camera: Camera;
   private viewport: HTMLElement;
@@ -67,8 +69,8 @@ export class Input {
     document.addEventListener('mousemove', (e) => {
       if (!this.dragging) return;
       this.camera.setTarget(
-        this.dragCamX + (this.dragStartX - e.clientX),
-        this.dragCamY + (this.dragStartY - e.clientY),
+        this.dragCamX + (this.dragStartX - e.clientX) / this.camera.zoom,
+        this.dragCamY + (this.dragStartY - e.clientY) / this.camera.zoom,
       );
     });
 
@@ -78,26 +80,72 @@ export class Input {
     });
   }
 
+  private getTouchDist(e: TouchEvent): number {
+    const dx = e.touches[0].clientX - e.touches[1].clientX;
+    const dy = e.touches[0].clientY - e.touches[1].clientY;
+    return Math.hypot(dx, dy);
+  }
+
   private bindTouch() {
     this.viewport.addEventListener('touchstart', (e) => {
-      this.touchStartX = e.touches[0].clientX;
-      this.touchStartY = e.touches[0].clientY;
-      this.touchCamX = this.camera.targetX;
-      this.touchCamY = this.camera.targetY;
+      if (e.touches.length === 2) {
+        // Pinch start
+        this.isPinching = true;
+        this.lastPinchDist = this.getTouchDist(e);
+      } else if (e.touches.length === 1 && !this.isPinching) {
+        // Single-finger drag
+        this.touchStartX = e.touches[0].clientX;
+        this.touchStartY = e.touches[0].clientY;
+        this.touchCamX = this.camera.targetX;
+        this.touchCamY = this.camera.targetY;
+      }
     }, { passive: true });
 
     this.viewport.addEventListener('touchmove', (e) => {
-      this.camera.setTarget(
-        this.touchCamX + (this.touchStartX - e.touches[0].clientX),
-        this.touchCamY + (this.touchStartY - e.touches[0].clientY),
-      );
+      if (e.touches.length === 2 && this.isPinching) {
+        // Pinch zoom
+        const dist = this.getTouchDist(e);
+        const delta = (dist - this.lastPinchDist) * PINCH_ZOOM_SPEED;
+        this.camera.adjustZoom(delta);
+        this.lastPinchDist = dist;
+        e.preventDefault();
+      } else if (e.touches.length === 1 && !this.isPinching) {
+        // Single-finger pan
+        this.camera.setTarget(
+          this.touchCamX + (this.touchStartX - e.touches[0].clientX) / this.camera.zoom,
+          this.touchCamY + (this.touchStartY - e.touches[0].clientY) / this.camera.zoom,
+        );
+      }
+    }, { passive: false });
+
+    this.viewport.addEventListener('touchend', (e) => {
+      if (e.touches.length < 2) {
+        this.isPinching = false;
+      }
+      // Reset single-finger tracking when going from multi to single touch
+      if (e.touches.length === 1) {
+        this.touchStartX = e.touches[0].clientX;
+        this.touchStartY = e.touches[0].clientY;
+        this.touchCamX = this.camera.targetX;
+        this.touchCamY = this.camera.targetY;
+      }
     }, { passive: true });
   }
 
   private bindWheel() {
     this.viewport.addEventListener('wheel', (e) => {
-      this.camera.moveTarget(e.deltaX * WHEEL_MULTIPLIER, e.deltaY * WHEEL_MULTIPLIER);
-      e.preventDefault();
+      if (e.ctrlKey || e.metaKey) {
+        // Ctrl+scroll = zoom
+        this.camera.adjustZoom(-e.deltaY * WHEEL_ZOOM_SPEED);
+        e.preventDefault();
+      } else {
+        // Regular scroll = pan
+        this.camera.moveTarget(
+          e.deltaX * WHEEL_MULTIPLIER / this.camera.zoom,
+          e.deltaY * WHEEL_MULTIPLIER / this.camera.zoom,
+        );
+        e.preventDefault();
+      }
     }, { passive: false });
   }
 
@@ -107,8 +155,8 @@ export class Input {
       const px = (e.clientX - rect.left) / rect.width;
       const py = (e.clientY - rect.top) / rect.height;
       this.camera.setTarget(
-        px * WORLD_W - window.innerWidth / 2,
-        py * WORLD_H - window.innerHeight / 2,
+        px * WORLD_W - window.innerWidth / (2 * this.camera.zoom),
+        py * WORLD_H - window.innerHeight / (2 * this.camera.zoom),
       );
     });
   }

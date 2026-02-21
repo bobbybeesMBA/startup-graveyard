@@ -134,4 +134,33 @@ const { sectors, causes } = Astro.props;
     border-color: rgba(140,60,60,0.4);
     color: rgba(140,60,60,0.7);
   }
+
+  @media (max-width: 600px) {
+    .search-panel {
+      top: auto;
+      bottom: 0.6rem;
+      left: 0.6rem;
+      transform: none;
+    }
+
+    .search-toggle {
+      font-size: 0.28rem;
+      padding: 0.3rem 0.6rem;
+    }
+
+    .search-body {
+      min-width: 180px;
+      padding: 0.6rem;
+      /* Open upward on mobile */
+      position: absolute;
+      bottom: 100%;
+      left: 0;
+      margin-bottom: 0.3rem;
+      margin-top: 0;
+    }
+
+    .search-label { font-size: 0.2rem; }
+    .search-input, .search-select { font-size: 0.26rem; padding: 0.25rem 0.35rem; }
+    .search-clear { font-size: 0.22rem; }
+  }
 </style>

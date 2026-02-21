@@ -61,7 +61,8 @@ export class Engine {
     if (!this.running) return;
     this.input.processKeys();
     this.camera.update();
-    this.worldEl.style.transform = `translate(${-this.camera.x}px, ${-this.camera.y}px)`;
+    const z = this.camera.zoom;
+    this.worldEl.style.transform = `scale(${z}) translate(${-this.camera.x}px, ${-this.camera.y}px)`;
     this.minimap.update();
     this.particles.update();
     requestAnimationFrame(this.loop);

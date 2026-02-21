@@ -94,7 +94,33 @@
 /* ═══════ RESPONSIVE — HUD ═══════ */
 
 @media (max-width: 600px) {
-  .minimap { width: 80px; height: 80px; }
+  #hud {
+    padding: 0.5rem 0.6rem;
+    flex-wrap: wrap;
+  }
+
+  .hud-title {
+    font-size: 0.45rem;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 0.2rem;
+  }
+
+  .hud-right {
+    position: fixed;
+    bottom: 0.6rem;
+    right: 0.6rem;
+    z-index: 200;
+  }
+
+  .hud-stat { font-size: 0.28rem; }
+
+  .minimap { width: 70px; height: 70px; }
   .mm-dot { width: 2px; height: 2px; }
-  .mm-viewport { display: block; }
+
+  .nav-hint {
+    font-size: 0.3rem;
+    bottom: 0.6rem;
+    width: 80%;
+  }
 }
