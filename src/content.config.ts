@@ -39,7 +39,8 @@ const nurseryZones = ['recent', 'classic', 'ancient'] as const;
 const nurserySectors = [
   'Video', 'Social', 'Photo', 'E-Commerce', 'Communication',
   'Hospitality', 'Fintech', 'Discovery', 'Streaming', 'Mobile',
-  'Consumer', 'Deals', 'Gaming', 'Retail',
+  'Consumer', 'Deals', 'Gaming', 'Retail', 'Automotive',
+  'Electronics', 'Food', 'Energy',
 ] as const;
 
 const nursery = defineCollection({
