@@ -6,7 +6,10 @@ const { totalCapital } = Astro.props;
 ---
 
 <div id="hud">
-  <div class="hud-title">STARTUP GRAVEYARD</div>
+  <div>
+    <div class="hud-title">STARTUP GRAVEYARD</div>
+    <a href="/" style="font-family:var(--px);font-size:0.3rem;color:var(--text-dim);text-decoration:none;letter-spacing:0.1em;pointer-events:auto;display:block;margin-top:0.3rem;transition:color 0.3s;">&larr; HOME</a>
+  </div>
   <div class="hud-right">
     <div class="hud-stat">CAPITAL LOST: <span class="val" id="hudCap">{totalCapital}</span></div>
     <div class="hud-hint">SCROLL AROUND &middot; CLICK A GRAVE TO READ ITS OBITUARY</div>

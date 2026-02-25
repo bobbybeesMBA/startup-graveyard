@@ -1,0 +1,146 @@
+/* ═══════ NURSERY HUD ═══════ */
+
+#hud {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 200;
+  padding: 0.8rem 1.2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.6s;
+}
+#hud.visible { opacity: 1; }
+
+.hud-title {
+  font-size: 0.6rem;
+  color: var(--n-text-dim);
+  letter-spacing: 0.1em;
+  pointer-events: auto;
+}
+
+.hud-home {
+  font-family: var(--px);
+  font-size: 0.3rem;
+  color: var(--n-text-dim);
+  text-decoration: none;
+  letter-spacing: 0.1em;
+  transition: color 0.3s;
+  pointer-events: auto;
+  display: block;
+  margin-top: 0.3rem;
+}
+.hud-home:hover { color: var(--n-accent-pink); }
+
+.hud-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.4rem;
+  pointer-events: auto;
+}
+
+.hud-stat {
+  font-size: 0.35rem;
+  color: var(--n-text-dim);
+  letter-spacing: 0.08em;
+}
+
+.hud-stat .val { color: rgba(160,100,130,0.6); }
+
+.hud-hint {
+  font-size: 0.25rem;
+  color: rgba(80,60,70,0.25);
+  letter-spacing: 0.08em;
+}
+
+/* Minimap */
+.minimap {
+  width: 120px; height: 120px;
+  border: 1px solid rgba(244,160,184,0.15);
+  background: rgba(253,246,248,0.7);
+  border-radius: 3px;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  pointer-events: auto;
+  margin-top: 0.3rem;
+}
+
+.mm-dot {
+  position: absolute;
+  width: 3px; height: 3px;
+  background: var(--n-accent-pink);
+  border-radius: 50%;
+  opacity: 0.6;
+}
+
+.mm-viewport {
+  position: absolute;
+  border: 1px solid rgba(160,200,244,0.4);
+  background: rgba(160,200,244,0.06);
+  pointer-events: none;
+  transition: left 0.05s, top 0.05s;
+}
+
+/* Nav hint */
+.nav-hint {
+  position: fixed;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.38rem;
+  color: var(--n-text-dim);
+  letter-spacing: 0.12em;
+  z-index: 200;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.6s;
+  text-align: center;
+  line-height: 2.5;
+}
+.nav-hint.visible { opacity: 1; }
+
+.key {
+  display: inline-block;
+  border: 1px solid rgba(244,160,184,0.2);
+  padding: 1px 5px;
+  border-radius: 2px;
+  margin: 0 2px;
+}
+
+/* ═══════ RESPONSIVE — NURSERY HUD ═══════ */
+
+@media (max-width: 600px) {
+  #hud {
+    padding: 0.5rem 0.6rem;
+    flex-wrap: wrap;
+  }
+
+  .hud-title {
+    font-size: 0.45rem;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 0.2rem;
+  }
+
+  .hud-right {
+    position: fixed;
+    bottom: 0.6rem;
+    right: 0.6rem;
+    z-index: 200;
+  }
+
+  .hud-stat { font-size: 0.28rem; }
+
+  .minimap { width: 70px; height: 70px; }
+  .mm-dot { width: 2px; height: 2px; }
+
+  .nav-hint {
+    font-size: 0.3rem;
+    bottom: 0.6rem;
+    width: 80%;
+  }
+}

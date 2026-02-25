@@ -1,0 +1,157 @@
+---
+interface Props {
+  sectors: string[];
+}
+const { sectors } = Astro.props;
+---
+
+<div id="searchPanel" class="search-panel">
+  <button class="search-toggle" id="searchToggle">
+    <span class="search-icon">&#9734;</span> FILTER
+  </button>
+  <div class="search-body" id="searchBody">
+    <div class="search-field">
+      <label class="search-label">SEARCH</label>
+      <input type="text" id="searchInput" class="search-input" placeholder="Company name..." />
+    </div>
+    <div class="search-field">
+      <label class="search-label">SECTOR</label>
+      <select id="sectorFilter" class="search-select">
+        <option value="">All Sectors</option>
+        {sectors.map(s => <option value={s}>{s}</option>)}
+      </select>
+    </div>
+    <button class="search-clear" id="searchClear">CLEAR FILTERS</button>
+  </div>
+</div>
+
+<style>
+  .search-panel {
+    position: fixed;
+    top: 0.8rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 210;
+    pointer-events: auto;
+  }
+
+  .search-toggle {
+    font-family: var(--px);
+    font-size: 0.35rem;
+    color: var(--n-text-dim);
+    background: rgba(253,246,248,0.85);
+    border: 1px solid rgba(244,160,184,0.15);
+    padding: 0.35rem 0.8rem;
+    cursor: pointer;
+    letter-spacing: 0.1em;
+    border-radius: 2px;
+    transition: all 0.3s;
+  }
+
+  .search-toggle:hover {
+    border-color: rgba(244,160,184,0.35);
+    color: var(--n-text-mid);
+  }
+
+  .search-icon {
+    margin-right: 0.3rem;
+  }
+
+  .search-body {
+    display: none;
+    margin-top: 0.4rem;
+    background: rgba(253,246,248,0.95);
+    border: 1px solid rgba(244,160,184,0.12);
+    border-radius: 3px;
+    padding: 0.8rem;
+    min-width: 220px;
+    backdrop-filter: blur(8px);
+  }
+
+  .search-body.open {
+    display: block;
+  }
+
+  .search-field {
+    margin-bottom: 0.6rem;
+  }
+
+  .search-label {
+    display: block;
+    font-size: 0.22rem;
+    color: var(--n-text-dim);
+    letter-spacing: 0.15em;
+    margin-bottom: 0.25rem;
+  }
+
+  .search-input,
+  .search-select {
+    width: 100%;
+    font-family: var(--px);
+    font-size: 0.3rem;
+    color: var(--n-text-mid);
+    background: rgba(255,255,255,0.5);
+    border: 1px solid rgba(244,160,184,0.12);
+    padding: 0.3rem 0.4rem;
+    border-radius: 2px;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+
+  .search-input:focus,
+  .search-select:focus {
+    border-color: rgba(244,160,184,0.35);
+  }
+
+  .search-select option {
+    background: #fdf6f8;
+    color: rgba(60,40,50,0.7);
+  }
+
+  .search-clear {
+    font-family: var(--px);
+    font-size: 0.25rem;
+    color: rgba(160,100,130,0.5);
+    background: none;
+    border: 1px solid rgba(160,100,130,0.2);
+    padding: 0.25rem 0.5rem;
+    cursor: pointer;
+    letter-spacing: 0.1em;
+    border-radius: 2px;
+    width: 100%;
+    transition: all 0.3s;
+  }
+
+  .search-clear:hover {
+    border-color: rgba(160,100,130,0.4);
+    color: rgba(160,100,130,0.7);
+  }
+
+  @media (max-width: 600px) {
+    .search-panel {
+      top: auto;
+      bottom: 0.6rem;
+      left: 0.6rem;
+      transform: none;
+    }
+
+    .search-toggle {
+      font-size: 0.28rem;
+      padding: 0.3rem 0.6rem;
+    }
+
+    .search-body {
+      min-width: 180px;
+      padding: 0.6rem;
+      position: absolute;
+      bottom: 100%;
+      left: 0;
+      margin-bottom: 0.3rem;
+      margin-top: 0;
+    }
+
+    .search-label { font-size: 0.2rem; }
+    .search-input, .search-select { font-size: 0.26rem; padding: 0.25rem 0.35rem; }
+    .search-clear { font-size: 0.22rem; }
+  }
+</style>

@@ -1,0 +1,206 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import NurseryTitleScreen from '../../components/NurseryTitleScreen.astro';
+import NurseryWorld from '../../components/NurseryWorld.astro';
+import NurseryHUD from '../../components/NurseryHUD.astro';
+import NurseryPostModal from '../../components/NurseryPostModal.astro';
+import NurserySearchPanel from '../../components/NurserySearchPanel.astro';
+
+import '../../styles/nursery-global.css';
+import '../../styles/nursery-title.css';
+import '../../styles/nursery-world.css';
+import '../../styles/nursery-hud.css';
+import '../../styles/nursery-modal.css';
+
+const entries = await getCollection('nursery');
+const sorted = entries.sort((a, b) => b.data.pivotYear - a.data.pivotYear);
+
+const totalPivots = sorted.length;
+
+// Unique sectors for filter dropdown
+const sectors = [...new Set(sorted.map(e => e.data.sector))].sort();
+
+// Prepare entry data for the engine (client-side)
+const entryData = sorted.map(e => ({
+  name: e.data.name,
+  slug: e.data.slug,
+  tagline: e.data.tagline,
+  mvp: e.data.mvp,
+  became: e.data.became,
+  pivotYear: e.data.pivotYear,
+  sector: e.data.sector,
+  cribShape: e.data.cribShape,
+  zone: e.data.zone,
+  motto: e.data.motto,
+}));
+---
+
+<BaseLayout title="Startup Nursery — Where Today's Giants Took Their First Steps" description="15 origin stories of startups that pivoted from weird ideas into billion-dollar companies.">
+  <NurseryTitleScreen totalPivots={totalPivots} />
+  <NurseryWorld />
+  <NurseryHUD totalPivots={totalPivots} />
+  <NurserySearchPanel sectors={sectors} />
+  <NurseryPostModal />
+
+  <!-- Pre-rendered post templates (hidden, cloned into modal by JS) -->
+  {sorted.map(async (entry) => {
+    const { Content } = await render(entry);
+    return (
+      <template data-slug={entry.data.slug}>
+        <div class="n-scroll-engrave"><span class="arrow-down">&#9660;</span> SCROLL TO READ <span class="arrow-down">&#9660;</span></div>
+        <div class="n-chisel-line"></div>
+        <div class="n-post-meta">
+          <span class="n-pm-pill">{entry.data.sector}</span>
+          <span class="n-pm-pill accent">Pivoted {entry.data.pivotYear}</span>
+        </div>
+        <div class="n-post-body"><Content /></div>
+        <div class="n-post-footer">
+          <div class="n-chisel-line-sm"></div>
+          <div class="n-pf-label">MOTTO</div>
+          <div class="n-pf-text">"{entry.data.motto}"</div>
+        </div>
+      </template>
+    );
+  })}
+
+  <!-- Engine data + boot script -->
+  <script define:vars={{ entryData }}>
+    window.__NURSERY_ENTRIES__ = entryData;
+  </script>
+
+  <script>
+    import { NurseryEngine } from '../../engine/NurseryEngine';
+    import type { NurseryEntry } from '../../engine/nursery-types';
+
+    const entries: NurseryEntry[] = (window as any).__NURSERY_ENTRIES__;
+
+    // DOM elements
+    const viewport = document.getElementById('viewport')!;
+    const world = document.getElementById('world')!;
+    const minimap = document.getElementById('minimap')!;
+    const mmViewport = document.getElementById('mmViewport')!;
+
+    // Modal elements
+    const postOverlay = document.getElementById('postOverlay')!;
+    const cribHeader = document.getElementById('cribHeader')!;
+    const cribBodyInner = document.getElementById('cribBodyInner')!;
+    const cribBody = document.getElementById('cribBody')!;
+    const closeBtn = document.getElementById('closeBtn')!;
+
+    // Title screen
+    const titleScreen = document.getElementById('titleScreen')!;
+    const startBtn = document.getElementById('startBtn')!;
+    const hud = document.getElementById('hud')!;
+    const navHint = document.getElementById('navHint')!;
+
+    // Search elements
+    const searchToggle = document.getElementById('searchToggle')!;
+    const searchBody = document.getElementById('searchBody')!;
+    const searchInput = document.getElementById('searchInput') as HTMLInputElement;
+    const sectorFilter = document.getElementById('sectorFilter') as HTMLSelectElement;
+    const searchClear = document.getElementById('searchClear')!;
+    const searchPanel = document.getElementById('searchPanel')!;
+
+    function openPost(slug: string) {
+      const entry = entries.find(e => e.slug === slug);
+      if (!entry) return;
+
+      cribHeader.innerHTML = `
+        <div class="n-ph-pivot">ONCE UPON A PIVOT</div>
+        <div class="n-ph-name">${entry.name}</div>
+        <div class="n-ph-year">Pivoted ${entry.pivotYear}</div>
+        <div class="n-ph-tagline">${entry.tagline}</div>
+      `;
+
+      const template = document.querySelector(`template[data-slug="${slug}"]`) as HTMLTemplateElement;
+      if (template) {
+        cribBodyInner.innerHTML = '';
+        cribBodyInner.appendChild(template.content.cloneNode(true));
+      }
+
+      cribBody.scrollTop = 0;
+      postOverlay.classList.add('active');
+      history.pushState({ slug }, '', `/nursery/${slug}`);
+    }
+
+    function closePost() {
+      postOverlay.classList.remove('active');
+      if (history.state?.slug) {
+        history.pushState(null, '', '/nursery');
+      }
+    }
+
+    // Close modal handlers
+    closeBtn.addEventListener('click', closePost);
+    postOverlay.addEventListener('click', (e) => {
+      if (e.target === postOverlay) closePost();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closePost();
+    });
+
+    window.addEventListener('popstate', (e) => {
+      if (e.state?.slug) {
+        openPost(e.state.slug);
+      } else {
+        postOverlay.classList.remove('active');
+      }
+    });
+
+    // Create engine
+    const engine = new NurseryEngine(
+      { viewport, world, minimap, mmViewport },
+      entries,
+      openPost,
+    );
+
+    engine.init();
+
+    // Search/filter wiring
+    searchToggle.addEventListener('click', () => {
+      searchBody.classList.toggle('open');
+    });
+
+    function applyFilter() {
+      engine.filterCribs(
+        searchInput.value,
+        sectorFilter.value,
+      );
+    }
+
+    searchInput.addEventListener('input', applyFilter);
+    sectorFilter.addEventListener('change', applyFilter);
+    searchClear.addEventListener('click', () => {
+      searchInput.value = '';
+      sectorFilter.value = '';
+      engine.clearFilter();
+    });
+
+    // Hide search panel initially
+    searchPanel.style.display = 'none';
+
+    // Start button
+    startBtn.addEventListener('click', () => {
+      titleScreen.classList.add('hidden');
+      viewport.classList.add('active');
+      hud.classList.add('visible');
+      navHint.classList.add('visible');
+      searchPanel.style.display = '';
+      engine.start();
+      setTimeout(() => { titleScreen.style.display = 'none'; }, 1200);
+      setTimeout(() => { navHint.classList.remove('visible'); }, 5000);
+    });
+
+    // Direct URL to a post
+    const pathMatch = window.location.pathname.match(/^\/nursery\/(.+)$/);
+    if (pathMatch) {
+      titleScreen.style.display = 'none';
+      viewport.classList.add('active');
+      hud.classList.add('visible');
+      searchPanel.style.display = '';
+      engine.start();
+      openPost(pathMatch[1]);
+    }
+  </script>
+</BaseLayout>

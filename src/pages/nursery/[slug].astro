@@ -1,0 +1,75 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import '../../styles/nursery-global.css';
+import '../../styles/nursery-modal.css';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('nursery');
+  return entries.map(entry => ({
+    params: { slug: entry.data.slug },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const { name, slug, tagline, mvp, became, pivotYear, sector, motto } = entry.data;
+const title = `${name} — Startup Nursery`;
+const description = `${tagline}. ${name} pivoted in ${pivotYear} and became ${became}.`;
+---
+
+<BaseLayout title={title} description={description}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": `${name} — Startup Nursery`,
+      "description": description,
+      "author": { "@type": "Organization", "name": "Founders Files" },
+    })} />
+  </Fragment>
+
+  <div class="nursery-post-page" style="overflow:auto;">
+    <div class="nursery-post-header">
+      <div class="n-ph-pivot" style="font-size:0.3rem;letter-spacing:0.35em;color:rgba(160,100,130,0.35);margin-bottom:0.5rem;">ONCE UPON A PIVOT</div>
+      <div style="font-size:clamp(1rem,3.5vw,1.8rem);color:rgba(60,40,50,0.85);margin-bottom:0.4rem;font-family:'Press Start 2P',monospace;text-align:center;">{name}</div>
+      <div style="font-size:0.35rem;color:rgba(80,60,70,0.35);letter-spacing:0.12em;margin-bottom:0.3rem;font-family:'Press Start 2P',monospace;">Pivoted {pivotYear}</div>
+      <div style="font-size:0.4rem;color:rgba(80,60,70,0.45);line-height:2;font-style:italic;font-family:'Press Start 2P',monospace;">{tagline}</div>
+    </div>
+
+    <div style="display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;margin:1.5rem 0;">
+      <span class="n-pm-pill">{sector}</span>
+      <span class="n-pm-pill accent">Pivoted {pivotYear}</span>
+    </div>
+
+    <div class="n-post-body" style="max-width:640px;margin:0 auto;padding:0 2rem 2rem;">
+      <Content />
+    </div>
+
+    <div style="text-align:center;margin-top:1.5rem;padding-bottom:2rem;">
+      <div class="n-chisel-line-sm" style="width:120px;margin:0 auto 0.8rem;"></div>
+      <div class="n-pf-label">MOTTO</div>
+      <div class="n-pf-text" style="max-width:500px;margin:0.5rem auto;">"{motto}"</div>
+      <a href="/nursery" style="display:inline-block;margin-top:2rem;font-family:'Press Start 2P',monospace;font-size:0.35rem;color:rgba(160,100,130,0.5);text-decoration:none;border:1px solid rgba(160,100,130,0.2);padding:0.4rem 1rem;border-radius:2px;letter-spacing:0.1em;transition:all 0.3s;">&larr; RETURN TO THE NURSERY</a>
+    </div>
+  </div>
+
+  <style>
+    html, body { background: #fdf6f8; overflow: auto; height: auto; }
+    .nursery-post-page {
+      min-height: 100vh;
+      background: #fdf6f8;
+      padding: 3rem 1rem;
+      font-family: 'Press Start 2P', monospace;
+    }
+    .nursery-post-header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    a:hover {
+      border-color: rgba(244,160,184,0.4) !important;
+      color: rgba(160,100,130,0.7) !important;
+    }
+  </style>
+</BaseLayout>

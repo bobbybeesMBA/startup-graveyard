@@ -1,0 +1,44 @@
+/* ═══════ NURSERY GLOBAL — Variables, Reset, Base, Shared Keyframes ═══════ */
+
+:root {
+  --px: 'Press Start 2P', monospace;
+  --n-ground: #f8f0f4;
+  --n-grass: #e8f0e8;
+  --n-path: #f0e8f0;
+  --n-crib-wood: #d4a574;
+  --n-accent-pink: #f4a0b8;
+  --n-accent-blue: #a0c8f4;
+  --n-accent-yellow: #f4d488;
+  --n-text-dim: rgba(80,60,70,0.4);
+  --n-text-mid: rgba(80,60,70,0.6);
+  --n-text-bright: rgba(60,40,50,0.85);
+  --n-glow: rgba(244,160,184,0.15);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; overflow: hidden; background: #fdf6f8; }
+
+body {
+  font-family: var(--px);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+@keyframes n-float {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+@keyframes n-cloudDrift {
+  from { transform: translate(0, 0); }
+  to { transform: translate(40px, -15px); }
+}
+
+@keyframes n-twinkle {
+  0%,100% { opacity: 0.3; } 50% { opacity: 0.8; }
+}
+
+@keyframes n-engraveArrow {
+  0%,100% { transform: translateY(0); opacity: 0.3; }
+  50% { transform: translateY(3px); opacity: 0.6; }
+}

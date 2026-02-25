@@ -1,0 +1,25 @@
+---
+interface Props {
+  totalPivots: number;
+}
+const { totalPivots } = Astro.props;
+---
+
+<div id="hud">
+  <div>
+    <div class="hud-title">STARTUP NURSERY</div>
+    <a href="/" class="hud-home">&larr; HOME</a>
+  </div>
+  <div class="hud-right">
+    <div class="hud-stat">PIVOTS: <span class="val">{totalPivots}</span></div>
+    <div class="hud-hint">SCROLL AROUND &middot; CLICK A CRIB TO READ ITS ORIGIN</div>
+    <div class="minimap" id="minimap">
+      <div class="mm-viewport" id="mmViewport"></div>
+    </div>
+  </div>
+</div>
+
+<div class="nav-hint" id="navHint">
+  <span class="key">WASD</span> / <span class="key">ARROWS</span> / DRAG TO EXPLORE<br />
+  CLICK A CRIB TO READ ITS STORY
+</div>

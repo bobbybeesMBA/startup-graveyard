@@ -1,0 +1,16 @@
+---
+interface Props {
+  totalPivots: number;
+}
+const { totalPivots } = Astro.props;
+---
+
+<div id="titleScreen">
+  <div class="n-title-icons">&#9734; &#9790; &#9734;</div>
+  <div class="n-title-main">STARTUP NURSERY</div>
+  <div class="n-title-sub">WHERE TODAY'S GIANTS TOOK THEIR FIRST STEPS</div>
+  <div class="n-title-stats">
+    <div class="n-title-stat"><span class="num">{totalPivots}</span><span class="label">ORIGIN STORIES</span></div>
+  </div>
+  <button class="n-start-btn" id="startBtn">ENTER THE NURSERY</button>
+</div>
