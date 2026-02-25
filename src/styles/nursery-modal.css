@@ -124,6 +124,30 @@
 }
 .n-pm-pill.accent { border-color: rgba(160,200,244,0.25); color: rgba(80,120,180,0.5); background: rgba(160,200,244,0.05); }
 
+.n-reveal-banner {
+  text-align: center;
+  margin-bottom: 1.2rem;
+  padding: 0.6rem 1rem;
+  background: linear-gradient(135deg, rgba(244,160,184,0.08), rgba(160,200,244,0.08));
+  border: 1px solid rgba(244,160,184,0.15);
+  border-radius: 4px;
+}
+
+.n-reveal-label {
+  display: block;
+  font-size: 0.22rem;
+  letter-spacing: 0.3em;
+  color: rgba(160,100,130,0.4);
+  margin-bottom: 0.3rem;
+}
+
+.n-reveal-name {
+  display: block;
+  font-size: clamp(0.6rem, 2vw, 0.9rem);
+  color: rgba(80,50,90,0.85);
+  letter-spacing: 0.05em;
+}
+
 .n-post-body {
   font-family: var(--px);
   font-size: 0.38rem;

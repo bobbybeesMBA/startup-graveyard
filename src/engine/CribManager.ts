@@ -31,14 +31,13 @@ export class CribManager {
       el.dataset.name = entry.name.toLowerCase();
       el.style.transition = 'opacity 0.4s ease, transform 0.2s ease';
       el.innerHTML = `
-        <div class="crib-label">${entry.sector} · ${entry.became}</div>
+        <div class="crib-label">${entry.sector} · ${entry.pivotYear}</div>
         <div class="crib-glow"></div>
         <div class="crib-shadow"></div>
         <div class="crib-body">
-          <div class="c-mvp">${entry.mvp.length > 40 ? entry.mvp.slice(0, 37) + '...' : entry.mvp}</div>
-          <div class="c-name">${entry.name}</div>
+          <div class="c-tagline">${entry.tagline}</div>
           <div class="c-year">Pivoted ${entry.pivotYear}</div>
-          <div class="c-became">${entry.became.length > 35 ? entry.became.slice(0, 32) + '...' : entry.became}</div>
+          <div class="c-hint">CLICK TO REVEAL</div>
         </div>
         <div class="crib-blanket"></div>
       `;
