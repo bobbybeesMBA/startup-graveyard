@@ -5,5 +5,5 @@ import mdx from '@astrojs/mdx';
 export default defineConfig({
   integrations: [mdx()],
   output: 'static',
-  site: 'https://www.foundersfiles.com',
+  site: 'https://foundersfiles.robertjschulte.com',
 });
